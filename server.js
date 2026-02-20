@@ -16,8 +16,10 @@ const client = new Client({
   ]
 });
 
-// الكلمات المفتاحية لأي Hint
-const commands = ["سكربت", "سكربتات", "السكربت", "سكرب"];
+const commands = ["سكربت", "سكربتات", "السكربت", "السكربتات"];
+
+// مجموعة لتخزين المستخدمين الذين أغلقوا الـ Hint
+const disabledHintUsers = new Set();
 
 client.on("ready", () => {
   console.log(`Bot ready as ${client.user.tag}`);
@@ -25,41 +27,43 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-
   const msg = message.content.toLowerCase();
 
   // -----------------------------
   // 1️⃣ إذا وجد أي كلمة مفتاحية في أي مكان (Hint)
   // -----------------------------
-  for (const cmd of commands) {
-    if (msg.includes(cmd) && !msg.startsWith(".")) {
+  if (!msg.startsWith(".") && !disabledHintUsers.has(message.author.id)) {
+    for (const cmd of commands) {
+      if (msg.includes(cmd)) {
 
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("close_hint")
-          .setLabel("إغلاق الـ Hint")
-          .setStyle(ButtonStyle.Danger)
-      );
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("close_hint_permanent")
+            .setLabel("اغلاق الملاحظة للابد")
+            .setStyle(ButtonStyle.Danger)
+        );
 
-      const hintMsg = await message.reply({
-        content: "⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`",
-        components: [row]
-      });
+        const hintMsg = await message.reply({
+          content: "⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`",
+          components: [row]
+        });
 
-      const collector = hintMsg.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-        time: 60000
-      });
+        const collector = hintMsg.createMessageComponentCollector({
+          componentType: ComponentType.Button,
+          time: 60000
+        });
 
-      collector.on("collect", async (interaction) => {
-        if (interaction.customId === "close_hint" && interaction.user.id === message.author.id) {
-          await interaction.update({ content: "✅ تم إغلاق الـ Hint", components: [] });
-        } else {
-          await interaction.reply({ content: "❌ أنت غير مخول لإغلاق هذا الـ Hint", ephemeral: true });
-        }
-      });
+        collector.on("collect", async (interaction) => {
+          if (interaction.customId === "close_hint_permanent" && interaction.user.id === message.author.id) {
+            disabledHintUsers.add(interaction.user.id); // يمنع ظهور Hint مستقبلًا
+            await interaction.update({ content: "✅ تم إغلاق الملاحظة للأبد", components: [] });
+          } else {
+            await interaction.reply({ content: "❌ انت غير مسموح لك باغلاق الملاحظة", ephemeral: true });
+          }
+        });
 
-      return;
+        return;
+      }
     }
   }
 
@@ -67,7 +71,7 @@ client.on("messageCreate", async (message) => {
   // 2️⃣ الرد على الأمر مع نقطة
   // -----------------------------
   if (msg.startsWith(".")) {
-    const command = msg.slice(1); // إزالة النقطة
+    const command = msg.slice(1);
     if (commands.includes(command)) {
 
       const embed = new EmbedBuilder()
@@ -92,7 +96,7 @@ client.on("messageCreate", async (message) => {
             value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
           }
         )
-        .setFooter({ text: "Zen Hub Scripts" })
+        .setFooter({ text: "SA | ALONE" })
         .setTimestamp();
 
       return message.reply({ embeds: [embed] });
