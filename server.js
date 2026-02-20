@@ -15,46 +15,52 @@ client.on("ready", () => {
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  const msg = message.content.toLowerCase();
+  const msg = message.content.toLowerCase().trim();
 
-  // لازم تبدأ بنقطة
-  if (!msg.startsWith(".")) return;
+  // قائمة الكلمات الرئيسية
+  const commands = ["سكربت", "سكربتات", "السكربت", "سكرب"];
 
-  const command = msg.slice(1); // يحذف النقطة
+  // -----------------------------
+  // 1️⃣ Hint إذا كتب بدون نقطة
+  // -----------------------------
+  if (!msg.startsWith(".") && commands.includes(msg)) {
+    return message.reply("⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`");
+  }
 
-  if (
-    command === "سكربت" ||
-    command === "سكربتات" ||
-    command === "السكربت" ||
-    command === "السكربتات"
-  ) {
+  // -----------------------------
+  // 2️⃣ الرد على الأمر مع نقطة
+  // -----------------------------
+  if (msg.startsWith(".")) {
+    const command = msg.slice(1); // إزالة النقطة
+    if (commands.includes(command)) {
 
-    const embed = new EmbedBuilder()
-      .setColor(0x2ecc71)
-      .setTitle("📦 جميع السكربتات")
-      .setDescription("اختر السكربت الذي تريده من القائمة 👇🏻")
-      .addFields(
-        {
-          name: "🕵️ سكربت ماب السرقة",
-          value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462706628511006782"
-        },
-        {
-          name: "🌊 سكربت ماب السرقة (مود التسونامي)",
-          value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1466095729251713276"
-        },
-        {
-          name: "⚔️ سكربت ماب سرقة آلة PvP",
-          value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1470001617914036248"
-        },
-        {
-          name: "🌪️ سكربت ماب تسونامي الأصلي",
-          value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
-        }
-      )
-      .setFooter({ text: "Zen Hub Scripts" })
-      .setTimestamp();
+      const embed = new EmbedBuilder()
+        .setColor(0x2ecc71)
+        .setTitle("📦 جميع السكربتات")
+        .setDescription("اختر السكربت الذي تريده من القائمة 👇🏻")
+        .addFields(
+          {
+            name: "🕵️ سكربت ماب السرقة",
+            value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462706628511006782"
+          },
+          {
+            name: "🌊 سكربت ماب السرقة (مود التسونامي)",
+            value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1466095729251713276"
+          },
+          {
+            name: "⚔️ سكربت ماب سرقة آلة PvP",
+            value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1470001617914036248"
+          },
+          {
+            name: "🌪️ سكربت ماب تسونامي الأصلي",
+            value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
+          }
+        )
+        .setFooter({ text: "Zen Hub Scripts" })
+        .setTimestamp();
 
-    message.reply({ embeds: [embed] });
+      return message.reply({ embeds: [embed] });
+    }
   }
 });
 
