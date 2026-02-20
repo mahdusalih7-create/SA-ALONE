@@ -21,7 +21,7 @@ client.on("messageCreate", async (message) => {
     msg.includes("سكربتات") ||
     msg.includes("سكربت") ||
     msg.includes("السكربت") ||
-    msg.includes("سكرب")
+    msg.includes("السكربتات")
   ) {
 
     const embed = new EmbedBuilder()
