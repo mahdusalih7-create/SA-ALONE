@@ -9,7 +9,7 @@ const client = new Client({
 });
 
 client.on("ready", () => {
-  console.log(`Bot ready as ${client.user.tag}`);
+  console.log(`البوت جاهز ${client.user.tag}`);
 });
 
 client.on("messageCreate", async (message) => {
@@ -46,7 +46,7 @@ client.on("messageCreate", async (message) => {
           value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
         }
       )
-      .setFooter({ text: "Zen Hub Scripts" })
+      .setFooter({ text: "SA | ALONE" })
       .setTimestamp();
 
     message.reply({ embeds: [embed] });
