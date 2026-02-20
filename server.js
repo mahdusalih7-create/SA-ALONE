@@ -1,4 +1,12 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const { 
+  Client, 
+  GatewayIntentBits, 
+  EmbedBuilder, 
+  ActionRowBuilder, 
+  ButtonBuilder, 
+  ButtonStyle, 
+  ComponentType 
+} = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -8,23 +16,51 @@ const client = new Client({
   ]
 });
 
+const commands = ["سكربت", "سكربتات", "السكربت", "السكربتات "];
+
 client.on("ready", () => {
   console.log(`Bot ready as ${client.user.tag}`);
 });
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-
+  
   const msg = message.content.toLowerCase().trim();
 
-  // قائمة الكلمات الرئيسية
-  const commands = ["سكربت", "سكربتات", "السكربت", "سكرب"];
+  // -----------------------------
+  // 1️⃣ الرد على الكلمات بدون نقطة (Hint)
+  // -----------------------------
+  if (!msg.startsWith(".")) {
+    for (const cmd of commands) {
+      if (msg.includes(cmd)) {
+        // زر إغلاق
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId("close_hint")
+            .setLabel("إغلاق الـ Hint")
+            .setStyle(ButtonStyle.Danger)
+        );
 
-  // -----------------------------
-  // 1️⃣ Hint إذا كتب بدون نقطة
-  // -----------------------------
-  if (!msg.startsWith(".") && commands.includes(msg)) {
-    return message.reply("⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`");
+        const hintMsg = await message.reply({
+          content: "⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`",
+          components: [row]
+        });
+
+        // Await button click
+        const collector = hintMsg.createMessageComponentCollector({
+          componentType: ComponentType.Button,
+          time: 30000 // 30 ثانية للضغط
+        });
+
+        collector.on("collect", async (i) => {
+          if (i.user.id === message.author.id && i.customId === "close_hint") {
+            await i.update({ content: "تم إغلاق الـ Hint ✅", components: [] });
+          }
+        });
+
+        return; // توقف عن باقي التحقق
+      }
+    }
   }
 
   // -----------------------------
