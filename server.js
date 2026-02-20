@@ -16,7 +16,8 @@ const client = new Client({
   ]
 });
 
-const commands = ["سكربت", "سكربتات", "السكربت", "السكربتات "];
+// الكلمات المفتاحية لأي Hint
+const commands = ["سكربت", "سكربتات", "السكربت", "سكرب"];
 
 client.on("ready", () => {
   console.log(`Bot ready as ${client.user.tag}`);
@@ -24,42 +25,41 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
-  
-  const msg = message.content.toLowerCase().trim();
+
+  const msg = message.content.toLowerCase();
 
   // -----------------------------
-  // 1️⃣ الرد على الكلمات بدون نقطة (Hint)
+  // 1️⃣ إذا وجد أي كلمة مفتاحية في أي مكان (Hint)
   // -----------------------------
-  if (!msg.startsWith(".")) {
-    for (const cmd of commands) {
-      if (msg.includes(cmd)) {
-        // زر إغلاق
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId("close_hint")
-            .setLabel("إغلاق الـ Hint")
-            .setStyle(ButtonStyle.Danger)
-        );
+  for (const cmd of commands) {
+    if (msg.includes(cmd) && !msg.startsWith(".")) {
 
-        const hintMsg = await message.reply({
-          content: "⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`",
-          components: [row]
-        });
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("close_hint")
+          .setLabel("إغلاق الـ Hint")
+          .setStyle(ButtonStyle.Danger)
+      );
 
-        // Await button click
-        const collector = hintMsg.createMessageComponentCollector({
-          componentType: ComponentType.Button,
-          time: 30000 // 30 ثانية للضغط
-        });
+      const hintMsg = await message.reply({
+        content: "⚠️ إذا تبي تطلع لك السكربتات اكتب `.سكربت`",
+        components: [row]
+      });
 
-        collector.on("collect", async (i) => {
-          if (i.user.id === message.author.id && i.customId === "close_hint") {
-            await i.update({ content: "تم إغلاق الـ Hint ✅", components: [] });
-          }
-        });
+      const collector = hintMsg.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        time: 60000
+      });
 
-        return; // توقف عن باقي التحقق
-      }
+      collector.on("collect", async (interaction) => {
+        if (interaction.customId === "close_hint" && interaction.user.id === message.author.id) {
+          await interaction.update({ content: "✅ تم إغلاق الـ Hint", components: [] });
+        } else {
+          await interaction.reply({ content: "❌ أنت غير مخول لإغلاق هذا الـ Hint", ephemeral: true });
+        }
+      });
+
+      return;
     }
   }
 
