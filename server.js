@@ -9,7 +9,7 @@ const client = new Client({
 });
 
 client.on("ready", () => {
-  console.log(`البوت جاهز ${client.user.tag}`);
+  console.log(`Bot ready as ${client.user.tag}`);
 });
 
 client.on("messageCreate", async (message) => {
@@ -17,17 +17,22 @@ client.on("messageCreate", async (message) => {
 
   const msg = message.content.toLowerCase();
 
+  // لازم تبدأ بنقطة
+  if (!msg.startsWith(".")) return;
+
+  const command = msg.slice(1); // يحذف النقطة
+
   if (
-    msg.includes("سكربتات") ||
-    msg.includes("سكربت") ||
-    msg.includes("السكربت") ||
-    msg.includes("السكربتات")
+    command === "سكربت" ||
+    command === "سكربتات" ||
+    command === "السكربت" ||
+    command === "السكربتات"
   ) {
 
     const embed = new EmbedBuilder()
       .setColor(0x2ecc71)
       .setTitle("📦 جميع السكربتات")
-      .setDescription("اختر السكربت الذي تريده من القائمة بالأسفل 👇🏻")
+      .setDescription("اختر السكربت الذي تريده من القائمة 👇🏻")
       .addFields(
         {
           name: "🕵️ سكربت ماب السرقة",
@@ -46,7 +51,7 @@ client.on("messageCreate", async (message) => {
           value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
         }
       )
-      .setFooter({ text: "SA | ALONE" })
+      .setFooter({ text: "Zen Hub Scripts" })
       .setTimestamp();
 
     message.reply({ embeds: [embed] });
