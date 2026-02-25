@@ -55,7 +55,7 @@ client.on("messageCreate", async (message) => {
 
         collector.on("collect", async (interaction) => {
           if (interaction.customId === "close_hint_permanent" && interaction.user.id === message.author.id) {
-            disabledHintUsers.add(interaction.user.id); // يمنع ظهور Hint مستقبلًا
+            disabledHintUsers.add(interaction.user.id);
             await interaction.update({ content: "✅ تم إغلاق الملاحظة للأبد", components: [] });
           } else {
             await interaction.reply({ content: "❌ انت غير مسموح لك باغلاق الملاحظة", ephemeral: true });
@@ -94,6 +94,10 @@ client.on("messageCreate", async (message) => {
           {
             name: "🌪️ سكربت ماب تسونامي الأصلي",
             value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1462786270471393390"
+          },
+          {
+            name: "🔥 سكربت ماب اللافا",
+            value: "https://discord.com/channels/1411623180665098290/1413890559805751439/1476270639496171632"
           }
         )
         .setFooter({ text: "SA | ALONE" })
