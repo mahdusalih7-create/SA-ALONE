@@ -5,14 +5,16 @@ const {
   ActionRowBuilder, 
   ButtonBuilder, 
   ButtonStyle, 
-  ComponentType 
+  ComponentType,
+  PermissionsBitField
 } = require("discord.js");
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers // مهم للسحب العشوائي
   ]
 });
 
@@ -27,10 +29,34 @@ client.on("ready", () => {
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+  if (!message.guild) return;
+
   const msg = message.content.toLowerCase();
 
+  // =====================================
+  // 🎲 أمر شخص عشوائي (للأدمن فقط)
+  // =====================================
+  if (msg === ".شخص عشوائي") {
+
+    if (!message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      return message.reply("❌ هذا الأمر متاح فقط لصاحب أعلى رتبة.");
+    }
+
+    try {
+      const members = await message.guild.members.fetch();
+      const humans = members.filter(m => !m.user.bot);
+
+      const randomMember = humans.random();
+
+      return message.reply(`🎉 الشخص العشوائي هو: ${randomMember}`);
+    } catch (err) {
+      console.error(err);
+      return message.reply("❌ حدث خطأ أثناء السحب.");
+    }
+  }
+
   // -----------------------------
-  // 1️⃣ إذا وجد أي كلمة مفتاحية في أي مكان (Hint)
+  // 1️⃣ Hint عند ذكر كلمة سكربت
   // -----------------------------
   if (!msg.startsWith(".") && !disabledHintUsers.has(message.author.id)) {
     for (const cmd of commands) {
@@ -68,7 +94,7 @@ client.on("messageCreate", async (message) => {
   }
 
   // -----------------------------
-  // 2️⃣ الرد على الأمر مع نقطة
+  // 2️⃣ أمر السكربتات
   // -----------------------------
   if (msg.startsWith(".")) {
     const command = msg.slice(1);
